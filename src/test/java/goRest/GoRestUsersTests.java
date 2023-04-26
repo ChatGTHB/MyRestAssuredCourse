@@ -26,7 +26,6 @@ public class GoRestUsersTests {
         requestSpecification=new RequestSpecBuilder()
                 .addHeader("Authorization", "Bearer 4b97b6d4f186b3272628a611715896f3ab8577ae2ea6ccb07b24ca2ae90d60fc")
                 .setContentType(ContentType.JSON)
-                .setBaseUri(baseURI)
                 .build();
     }
 
