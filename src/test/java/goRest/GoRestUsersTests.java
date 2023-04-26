@@ -1,8 +1,14 @@
 package goRest;
 
 import com.github.javafaker.Faker;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
@@ -10,9 +16,22 @@ import static org.hamcrest.Matchers.*;
 public class GoRestUsersTests {
     int userID;
     Faker randomGenerator = new Faker();
+    RequestSpecification requestSpecification;
+    @BeforeClass
+    public void setup(){
 
-    @Test
-    public void createUser() {
+        baseURI="https://gorest.co.in/public/v2/users";
+       // baseURI="https://gorest.co.in/public/v2/users/";
+
+        requestSpecification=new RequestSpecBuilder()
+                .addHeader("Authorization", "Bearer 4b97b6d4f186b3272628a611715896f3ab8577ae2ea6ccb07b24ca2ae90d60fc")
+                .setContentType(ContentType.JSON)
+                .setBaseUri(baseURI)
+                .build();
+    }
+
+    @Test(enabled = false)
+    public void createUserJson() {
 
         // POST https://gorest.co.in/public/v2/users
         // "Authorization: Bearer 523891d26e103bab0089022d20f1820be2999a7ad693304f560132559a2a152d"
@@ -23,14 +42,13 @@ public class GoRestUsersTests {
 
         userID =
                 given()
-                        .header("Authorization", "Bearer 4b97b6d4f186b3272628a611715896f3ab8577ae2ea6ccb07b24ca2ae90d60fc")
-                        .contentType(ContentType.JSON) // gönderilecek data JSON
+                        .spec(requestSpecification)
                         .body("{\"name\":\"" + randomFullname + "\", \"gender\":\"male\", \"email\":\"" + randomEmail + "\", \"status\":\"active\"}")
                         .log().uri()
                         .log().body()
 
                         .when()
-                        .post("https://gorest.co.in/public/v2/users")
+                        .post("")
 
                         .then()
                         .log().body()
@@ -40,14 +58,72 @@ public class GoRestUsersTests {
         ;
     }
 
-    @Test(dependsOnMethods = "createUser")
+    @Test
+    public void createUserMap() {
+
+        String randomFullname = randomGenerator.name().fullName();
+        String randomEmail = randomGenerator.internet().emailAddress();
+
+        Map<String,String> newUser=new HashMap<>();
+        newUser.put("name",randomFullname);
+        newUser.put("gender","male");
+        newUser.put("email",randomEmail);
+        newUser.put("status","active");
+
+        userID =
+                given()
+                        .spec(requestSpecification)
+                        .body(newUser)
+                        //.log().uri()
+                        //.log().body()
+
+                        .when()
+                        .post("")
+
+                        .then()
+                        .log().body()
+                        .statusCode(201)
+                        .contentType(ContentType.JSON)
+                        .extract().path("id");
+    }
+
+    @Test(enabled = false)
+    public void createUserClass() {
+
+        String randomFullname = randomGenerator.name().fullName();
+        String randomEmail = randomGenerator.internet().emailAddress();
+
+        User newUser=new User();
+        newUser.name=randomFullname;
+        newUser.gender="male";
+        newUser.email=randomEmail;
+        newUser.status="active";
+
+        userID =
+                given()
+                        .spec(requestSpecification)
+                        .body(newUser)
+                        //.log().uri()
+                        //.log().body()
+
+                        .when()
+                        .post("")
+
+                        .then()
+                        .log().body()
+                        .statusCode(201)
+                        .contentType(ContentType.JSON)
+                        .extract().path("id");
+    }
+
+    @Test(dependsOnMethods = "createUserMap")
     public void getUserById() {
 
         given()
-                .header("Authorization", "Bearer 4b97b6d4f186b3272628a611715896f3ab8577ae2ea6ccb07b24ca2ae90d60fc")
+                .spec(requestSpecification)
 
                 .when()
-                .get("https://gorest.co.in/public/v2/users/"+userID)
+                .get(""+userID)
 
                 .then()
                 .log().body()
@@ -58,13 +134,35 @@ public class GoRestUsersTests {
 
     }
 
-    @Test
+    @Test(dependsOnMethods = "getUserById")
     public void updateUser() {
+
+        Map<String,String>updateUser=new HashMap<>();
+        updateUser.put("name","kerem yigit");
+
+        given()
+                .spec(requestSpecification)
+                .body(updateUser)
+
+                .when()
+                .put(""+userID)
+
+                .then()
+                .statusCode(200)
+                .body("id",equalTo(userID))
+                .body("name",equalTo("kerem yigit"))
+
+        ;
 
     }
 
     @Test
     public void deleteUser() {
+
+    }
+
+    @Test
+    public void deleteUserNegative() {
 
     }
 }
