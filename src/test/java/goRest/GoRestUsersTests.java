@@ -186,7 +186,8 @@ public class GoRestUsersTests {
                 .log().all()
                 .statusCode(404)
         ;
-
-
     }
+
+    // TODO : Weekend TODO:  You can use your previous posts and comments resources in GoRest.
+    // TODO : Do your API Automation(Create,get,update,delete,deletenegatife)
 }
