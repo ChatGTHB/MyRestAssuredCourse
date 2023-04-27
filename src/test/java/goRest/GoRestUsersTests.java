@@ -17,13 +17,14 @@ public class GoRestUsersTests {
     int userID;
     Faker randomGenerator = new Faker();
     RequestSpecification requestSpecification;
+
     @BeforeClass
-    public void setup(){
+    public void setup() {
 
-        baseURI="https://gorest.co.in/public/v2/users";
-       // baseURI="https://gorest.co.in/public/v2/users/";
+        baseURI = "https://gorest.co.in/public/v2/users";
+        // baseURI="https://gorest.co.in/public/v2/users/";
 
-        requestSpecification=new RequestSpecBuilder()
+        requestSpecification = new RequestSpecBuilder()
                 .addHeader("Authorization", "Bearer 4b97b6d4f186b3272628a611715896f3ab8577ae2ea6ccb07b24ca2ae90d60fc")
                 .setContentType(ContentType.JSON)
                 .build();
@@ -63,11 +64,11 @@ public class GoRestUsersTests {
         String randomFullname = randomGenerator.name().fullName();
         String randomEmail = randomGenerator.internet().emailAddress();
 
-        Map<String,String> newUser=new HashMap<>();
-        newUser.put("name",randomFullname);
-        newUser.put("gender","male");
-        newUser.put("email",randomEmail);
-        newUser.put("status","active");
+        Map<String, String> newUser = new HashMap<>();
+        newUser.put("name", randomFullname);
+        newUser.put("gender", "male");
+        newUser.put("email", randomEmail);
+        newUser.put("status", "active");
 
         userID =
                 given()
@@ -92,11 +93,11 @@ public class GoRestUsersTests {
         String randomFullname = randomGenerator.name().fullName();
         String randomEmail = randomGenerator.internet().emailAddress();
 
-        User newUser=new User();
-        newUser.name=randomFullname;
-        newUser.gender="male";
-        newUser.email=randomEmail;
-        newUser.status="active";
+        User newUser = new User();
+        newUser.name = randomFullname;
+        newUser.gender = "male";
+        newUser.email = randomEmail;
+        newUser.status = "active";
 
         userID =
                 given()
@@ -122,13 +123,13 @@ public class GoRestUsersTests {
                 .spec(requestSpecification)
 
                 .when()
-                .get(""+userID)
+                .get("" + userID)
 
                 .then()
                 .log().body()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id",equalTo(userID))
+                .body("id", equalTo(userID))
         ;
 
     }
@@ -136,32 +137,56 @@ public class GoRestUsersTests {
     @Test(dependsOnMethods = "getUserById")
     public void updateUser() {
 
-        Map<String,String>updateUser=new HashMap<>();
-        updateUser.put("name","kerem yigit");
+        Map<String, String> updateUser = new HashMap<>();
+        updateUser.put("name", "kerem yigit");
 
         given()
                 .spec(requestSpecification)
                 .body(updateUser)
 
                 .when()
-                .put(""+userID)
+                .put("" + userID)
 
                 .then()
+                .log().body()
                 .statusCode(200)
-                .body("id",equalTo(userID))
-                .body("name",equalTo("kerem yigit"))
+                .body("id", equalTo(userID))
+                .body("name", equalTo("kerem yigit"))
 
         ;
 
     }
 
-    @Test
+    //TODO
+    @Test(dependsOnMethods = "updateUser")
     public void deleteUser() {
+
+        given()
+                .spec(requestSpecification)
+                .when()
+                .delete("" + userID)
+
+                .then()
+                .log().all()
+                .statusCode(204)
+        ;
 
     }
 
-    @Test
+    //TODO
+    @Test(dependsOnMethods = "deleteUser")
     public void deleteUserNegative() {
+
+        given()
+                .spec(requestSpecification)
+                .when()
+                .delete("" + userID)
+
+                .then()
+                .log().all()
+                .statusCode(404)
+        ;
+
 
     }
 }
