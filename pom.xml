@@ -48,5 +48,24 @@
 
     </dependencies>
 
+<!-- Setting the section to run when the maven test is run -->
+
+    <!--  The plugin that we specify where the Jenkins run command will run. -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <configuration>
+
+                    <suiteXmlFiles>
+                        <suiteXmlFile>testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 
